@@ -24,12 +24,16 @@ mbr.win.onload(function (body, head) {
               ifc.showCurtain();
               break;
             case 'success':
+              ifc.notification('Authentication successful', 'normal');
               ifc.initializeForm();
               break;
           }
           break;
         case 'response':
           ifc.getResponse(data.data);
+          break;
+        case 'error':
+          ifc.notification(data.data, 'error');
           break;
       }
     };
@@ -44,7 +48,7 @@ mbr.win.onload(function (body, head) {
 // data get entity @e[limit=1]
 // {"Brain": {"memories": {}}, "HurtByTimestamp": 0, "Attributes": [{"Base": "10.0", "Name": "generic.maxHealth"}, {"Base": "0.0", "Name": "generic.knockbackResistance"}, {"Base": "0.25", "Name": "generic.movementSpeed"}, {"Base": "0.0", "Name": "generic.armor"}, {"Base": "0.0", "Name": "generic.armorToughness"}, {"Base": "16.0", "Modifiers": [{"UUIDMost": "-2098362545563283723", "UUIDLeast": "-9107005958253744381", "Amount": "-0.031134477162398408", "Operation": 1, "Name": "Random spawn bonus"}], "Name": "generic"."ollowRange"}, {"Base": "0.0", "Name": "generic.attackKnockback"}], "Invulnerable": "0", "FallFlying": "0", "ForcedAge": 0, "PortalCooldown": 0, "AbsorptionAmount": "0.0", "Saddle": "0", "FallDistance": "0.0", "InLove": 0, "DeathTime": "0", "HandDropChances": ["0.085", "0.085"], "PersistenceRequired": "0", "Age": 0, "Motion": ["0.0", "-0.0784000015258789", "0.0"], "UUIDLeast": "-5791582993077350753", "Health": "10.0", "LeftHanded": "0", "Air": "300", "OnGround": "1", "Dimension": 0, "Rotation": ["131.00243", "0.0"], "HandItems": [{}, {}], "ArmorDropChances": ["0.085", "0.085", "0.085", "0.085"], "UUIDMost": "-1720560224059572127", "Pos": ["-110.25251856249145", "70.0", "50.71780580979524"], "Fire": "-1", "ArmorItems": [{}, {}, {}, {}], "CanPickUpLoot": "0", "HurtTime": "0"}
   function parseJSON(data) {
-    var result = {data: '"Failed to parse"'};
+    var result = {data: 'Failed to parse'};
     var regMatch = RE.PARSE.exec(data);
     var parsed;
 
@@ -115,12 +119,21 @@ mbr.win.onload(function (body, head) {
     });
   });
 
-  mbr.dom('table', body, function (mainTable) {
-    var body = mainTable.insertRow().insertCell();
-    mainTable.className = 'full-table';
-    body.className = 'full-table-body';
+  mbr.dom('div', body, function (notifications) {
+    notifications.className = 'notifications';
+    ifc.notification = function (message, type) {
+      var notification = mbr.dom('div', notifications, {
+        className: 'notifications-item ' + type,
+        innerHTML: message
+      });
+      setTimeout(function () {notifications.removeChild(notification)}, 7000);
+    }
+  });
 
-    mbr.dom('div', body, function (form) {
+  mbr.dom('div', body, function (main) {
+    main.className = 'main';
+
+    mbr.dom('div', main, function (form) {
       form.className = 'form';
       var input;
       var button;

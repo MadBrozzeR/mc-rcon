@@ -21,7 +21,7 @@
   "license": "ISC",
   "dependencies": {
     "madsocket": "^1.0.3",
-    "mbr-rcon": "^1.0.1",
+    "mbr-rcon": "^1.0.2",
     "mbr-script": "^1.0.0"
   }
 }

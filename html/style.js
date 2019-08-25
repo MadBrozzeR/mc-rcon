@@ -1,4 +1,23 @@
 var style = {
+  '@keyframes notification': {
+    '0%': {
+      left: '100%',
+      opacity: 0
+    },
+    '10%': {
+      left: '0%',
+      opacity: 1
+    },
+    '90%': {
+      left: '0%',
+      opacity: 1
+    },
+    '100%': {
+      left: '100%',
+      opacity: 0
+    }
+  },
+
   '*': {
     boxSizing: 'border-box'
   },
@@ -22,15 +41,12 @@ var style = {
     background: '#ccf',
     cursor: 'pointer'
   },
-  '.full-table': {
+  '.main': {
     width: '100%',
     height: '100%',
-
-    '-body': {
-      verticalAlign: 'middle',
-      textAlign: 'center',
-      padding: '12px 0'
-    }
+    margin: '0 auto',
+    textAlign: 'center',
+    padding: '12px 0'
   },
   '.curtain': {
     position: 'fixed',
@@ -122,6 +138,30 @@ var style = {
       margin: '0 3px 3px 0',
       padding: '0 5px',
       cursor: 'pointer'
+    }
+  },
+  '.notifications': {
+    position: 'fixed',
+    right: '10px',
+    top: '10px',
+
+    '-item': {
+      position: 'relative',
+      width: '300px',
+      padding: '12px',
+      minHeight: '64px',
+      animationName: 'notification',
+      animationDuration: '7s',
+      marginBottom: '4px',
+
+      '.error': {
+        background: '#f33',
+        border: '1px solid #a00'
+      },
+      '.normal': {
+        background: '#080',
+        border: '1px solid #030'
+      }
     }
   }
 };

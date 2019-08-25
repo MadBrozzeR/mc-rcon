@@ -23,12 +23,15 @@ function send (type, data) {
 }
 
 const WS = new MadSocket({
+  error: function (error) {
+    console.log(error);
+  },
   connect: function () {
     const client = this;
     clients.add(this);
     client.params.connection = rcon.connect({
       onError: function (error) {
-        console.log(client.params, error);
+        console.log(error);
         send.call(client, 'error', 'Failed to connect to remote console');
       },
       onSuccess: function () {
@@ -37,7 +40,7 @@ const WS = new MadSocket({
     });
   },
   disconnect: function () {
-    client.params.connection.close();
+    this.params.connection.close();
     clients.del(this);
   },
   message: function (message) {
