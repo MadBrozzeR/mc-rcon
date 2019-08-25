@@ -17,6 +17,14 @@ var style = {
       opacity: 0
     }
   },
+  '@keyframes fadeIn': {
+    from: {
+      opacity: 0
+    },
+    to: {
+      opacity: 1
+    }
+  },
 
   '*': {
     boxSizing: 'border-box'
@@ -44,7 +52,6 @@ var style = {
   '.main': {
     width: '100%',
     height: '100%',
-    margin: '0 auto',
     textAlign: 'center',
     padding: '12px 0'
   },
@@ -96,6 +103,36 @@ var style = {
     }
   },
 
+  '.history': {
+    height: '100%',
+    textAlign: 'left',
+    display: 'inline-block',
+    marginRight: '4px',
+    background: '#ccf',
+    verticalAlign: 'top',
+    width: '300px',
+    padding: '24px',
+
+    '-item': {
+      cursor: 'pointer',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      background: '#fff',
+      border: '1px solid #779',
+      padding: '2px 5px',
+      marginBottom: '4px',
+      animationName: 'fadeIn',
+      animationDuration: '.5s',
+
+      ':before': {
+        content: '"- "'
+      },
+      ':hover': {
+        background: '#eee'
+      }
+    }
+  },
   '.form': {
     display: 'inline-block',
     maxWidth: '1000px',

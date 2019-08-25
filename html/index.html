@@ -133,10 +133,26 @@ mbr.win.onload(function (body, head) {
   mbr.dom('div', body, function (main) {
     main.className = 'main';
 
+    mbr.dom('div', main, function (history) {
+      history.className = 'history';
+
+      ifc.historyPush = function (command, response) {
+        mbr.dom('div', history, {
+          className: 'history-item',
+          innerHTML: command,
+          onclick: function () {
+            ifc.historyPick(command, response);
+          }
+        });
+      }
+    });
+
     mbr.dom('div', main, function (form) {
       form.className = 'form';
       var input;
       var button;
+      var response = {};
+      var output;
 
       ifc.initializeForm = function () {
         input.disabled = false;
@@ -150,8 +166,11 @@ mbr.win.onload(function (body, head) {
         }
       }
 
-      var response = {};
-      var output;
+      ifc.historyPick = function (command, responseItem) {
+        input.value = command;
+        response = responseItem;
+        output.innerHTML = response.text;
+      }
 
       mbr.dom('div', form, function (commandRow) {
         commandRow.className = 'command-row';
@@ -197,6 +216,7 @@ mbr.win.onload(function (body, head) {
         ifc.getResponse = function (data) {
           response = {text: data};
           output.innerHTML = data;
+          ifc.historyPush(input.value, response);
         }
       });
     });
