@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MineCraft remote console</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+<script src='src/mbr-script.js'></script>
+<script src='src/style.js'></script>
+</head>
+<script>
+mbr.win.onload(function (body, head) {
+  mbr.styleSheet(style, head);
+  var ifc = {};
+  var socket;
+
+  function connect () {
+    socket = new WebSocket('ws://127.0.0.1:8080/ws');
+    socket.onmessage = function (event) {
+      var data = JSON.parse(event.data);
+      switch (data.type) {
+        case 'auth':
+          switch (data.data) {
+            case 'ready':
+              ifc.showCurtain();
+              break;
+            case 'success':
+              ifc.initializeForm();
+              break;
+          }
+          break;
+        case 'response':
+          ifc.getResponse(data.data);
+          break;
+      }
+    };
+  }
+
+  const RE = {
+    PARSE: /^([\w ]+:\s*)?(\{.+\})$/,
+    KEYS: /(\w+):/g,
+    NUMBERS: /((?:-)?[\d]+(?:\.[\d]+)?)(d|f|s|b|L)/g
+  };
+
+// data get entity @e[limit=1]
+// {"Brain": {"memories": {}}, "HurtByTimestamp": 0, "Attributes": [{"Base": "10.0", "Name": "generic.maxHealth"}, {"Base": "0.0", "Name": "generic.knockbackResistance"}, {"Base": "0.25", "Name": "generic.movementSpeed"}, {"Base": "0.0", "Name": "generic.armor"}, {"Base": "0.0", "Name": "generic.armorToughness"}, {"Base": "16.0", "Modifiers": [{"UUIDMost": "-2098362545563283723", "UUIDLeast": "-9107005958253744381", "Amount": "-0.031134477162398408", "Operation": 1, "Name": "Random spawn bonus"}], "Name": "generic"."ollowRange"}, {"Base": "0.0", "Name": "generic.attackKnockback"}], "Invulnerable": "0", "FallFlying": "0", "ForcedAge": 0, "PortalCooldown": 0, "AbsorptionAmount": "0.0", "Saddle": "0", "FallDistance": "0.0", "InLove": 0, "DeathTime": "0", "HandDropChances": ["0.085", "0.085"], "PersistenceRequired": "0", "Age": 0, "Motion": ["0.0", "-0.0784000015258789", "0.0"], "UUIDLeast": "-5791582993077350753", "Health": "10.0", "LeftHanded": "0", "Air": "300", "OnGround": "1", "Dimension": 0, "Rotation": ["131.00243", "0.0"], "HandItems": [{}, {}], "ArmorDropChances": ["0.085", "0.085", "0.085", "0.085"], "UUIDMost": "-1720560224059572127", "Pos": ["-110.25251856249145", "70.0", "50.71780580979524"], "Fire": "-1", "ArmorItems": [{}, {}, {}, {}], "CanPickUpLoot": "0", "HurtTime": "0"}
+  function parseJSON(data) {
+    var result = {data: '"Failed to parse"'};
+    var regMatch = RE.PARSE.exec(data);
+    var parsed;
+
+    if (regMatch) {
+      parsed = {info: regMatch[1]};
+
+      parsed.data = regMatch[2].replace(RE.KEYS, '"$1":').replace(RE.NUMBERS, '"$1$2"');
+
+      try {
+        parsed.data = JSON.parse(parsed.data);
+        result = parsed;
+      } catch (error) {
+        console.log(parsed.data);
+        console.log(error);
+      }
+    }
+
+    return result;
+  }
+
+  connect();
+
+  ifc.send = function (message, type) {
+    socket.send(JSON.stringify({type: type || 'command', data: message}));
+  }
+
+  mbr.dom('div', body, function (curtainBlock) {
+    var curtainCN = mbr.cn(curtainBlock).set(['curtain']);
+    mbr.dom('table', curtainBlock, function (curtain) {
+      var body = curtain.insertRow().insertCell();
+      curtain.className = 'curtain-table';
+      body.className = 'curtain-body';
+      ifc.showCurtain = function () {
+        curtainCN.add('active');
+      };
+      ifc.hideCurtain = function () {
+        curtainCN.del('active');
+      };
+
+      mbr.dom('div', body, function (auth) {
+        auth.className = 'auth';
+        var input;
+        var button;
+
+        function send() {
+          ifc.send(input.value, 'auth');
+        }
+
+        mbr.dom('div', auth, function (authRow) {
+          authRow.className = 'auth-row';
+
+          input = mbr.dom('input', authRow, {
+            type: 'password',
+            placeholder: 'password',
+            onkeypress: function (event) {
+              if (event.keyCode === 13) {
+                send();
+              }
+            }
+          });
+          button = mbr.dom('button', authRow, {
+            className: 'auth-submit',
+            innerHTML: 'Authenticate',
+            onclick: send
+          });
+        });
+      });
+    });
+  });
+
+  mbr.dom('table', body, function (mainTable) {
+    var body = mainTable.insertRow().insertCell();
+    mainTable.className = 'full-table';
+    body.className = 'full-table-body';
+
+    mbr.dom('div', body, function (form) {
+      form.className = 'form';
+      var input;
+      var button;
+
+      ifc.initializeForm = function () {
+        input.disabled = false;
+        button.disabled = false;
+        ifc.hideCurtain();
+      }
+
+      function send() {
+        if (!input.disabled) {
+          ifc.send(input.value);
+        }
+      }
+
+      var response = {};
+      var output;
+
+      mbr.dom('div', form, function (commandRow) {
+        commandRow.className = 'command-row';
+
+        input = mbr.dom('input', commandRow, {
+          className: 'command-input',
+          disabled: true,
+          onkeypress: function (event) {
+            if (event.keyCode === 13) {
+              send();
+            }
+          }
+        });
+        button = mbr.dom('button', commandRow, {
+          className: 'command-submit',
+          innerHTML: 'submit',
+          disabled: true,
+          onclick: send
+        });
+      });
+      mbr.dom('div', form, function (toolbar) {
+        toolbar.className = 'toolbar';
+
+        mbr.dom('span', toolbar, {
+          className: 'toolbar-button',
+          innerHTML: 'normal',
+          onclick: function () {
+            output.innerHTML = response.text;
+          }
+        });
+        mbr.dom('span', toolbar, {
+          className: 'toolbar-button',
+          innerHTML: 'json',
+          onclick: function () {
+            response.json = response.json || JSON.stringify(parseJSON(response.text), null, 2);
+            output.innerHTML = response.json;
+          }
+        });
+      });
+      output = mbr.dom('div', form, function (output) {
+        output.className = 'output';
+
+        ifc.getResponse = function (data) {
+          response = {text: data};
+          output.innerHTML = data;
+        }
+      });
+    });
+  });
+});
+</script>
+<body>
+</body>
+</html>

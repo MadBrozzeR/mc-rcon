@@ -1,0 +1,27 @@
+{
+  "name": "minecraft-rcon",
+  "version": "1.0.0",
+  "description": "Remote console for minecraft as plugin to mbr-serv",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitgub.com/madbrozzer/mc-rcon.git"
+  },
+  "keywords": [
+    "minecraft",
+    "rcon",
+    "remote",
+    "console"
+  ],
+  "author": "MadBrozzeR",
+  "license": "ISC",
+  "dependencies": {
+    "madsocket": "^1.0.3",
+    "mbr-rcon": "^1.0.1",
+    "mbr-script": "^1.0.0"
+  }
+}
